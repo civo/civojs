@@ -1,8 +1,8 @@
 import { faker } from '@faker-js/faker';
 import { afterAll, expect, test } from 'vitest';
 
-import { Civo } from '..';
-import { CreateRoute, SubnetConfig } from '../resources/networks/types';
+import { Civo } from '../src';
+import { CreateRoute, SubnetConfig } from '../src/resources/networks/types';
 
 const client = new Civo({
   apiKey: import.meta.env.API_KEY,

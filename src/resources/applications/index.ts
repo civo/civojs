@@ -3,7 +3,8 @@ import { z } from 'zod';
 
 import { SimpleResponseSchema } from '../../types';
 import { randomName } from '../../utils';
-import { Base, NetworksApi } from '..';
+import { Base } from '../base';
+import { NetworksApi } from '../networks';
 import {
   ApplicationConfig,
   ApplicationSchema,

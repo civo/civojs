@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 
-import { Region } from '../resources/regions/types';
+import { Region } from '../src/resources/regions/types';
 
 export function createRandomRegion(): Region {
   const country = faker.location.countryCode();

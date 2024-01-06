@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 
-import { Civo } from '..';
+import { Civo } from '../src';
 
 const client = new Civo({
   apiKey: import.meta.env.API_KEY,
