@@ -4,7 +4,7 @@
 Typescript client for Civo API
 
 ```typescript
-import { Civo } from 'civots';
+import { Civo } from 'civojs';
 
 const client = new Civo({
   apiKey: '<CIVO_API_KEY>',
