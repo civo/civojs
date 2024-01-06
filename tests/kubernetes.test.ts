@@ -1,28 +1,29 @@
-// FILEPATH: /workspaces/civojs/tests/kubernetes.test.ts
+import { expect, test } from 'vitest';
 
-import { KubernetesApi } from '../src/resources/kubernetes';
-import nock from 'nock';
-import { test } from 'vitest';
-import { beforeEach, afterEach, expect } from 'vitest';
+import { Civo } from '../src';
 
-let api: KubernetesApi;
-
-beforeEach(() => {
-  api = new KubernetesApi({
-    apiKey: 'test',
-    regionCode: 'LON1',
-  });
+const client = new Civo({
+  apiKey: import.meta.env.API_KEY,
+  regionCode: 'LON1',
 });
 
-afterEach(() => {
-  nock.cleanAll();
+test('create a new cluster', async () => {
+  const network = await client.networks.getDefault();
+  const clusters = await client.kubernetes.listClusters();
+  if (clusters.items.length === 0) {
+    const cluster = await client.kubernetes.createCluster({
+      name: 'mycluster',
+      network_id: network.id,
+    });
+    expect(cluster).toBeTruthy();
+  }
+
+  expect(clusters.items[0].network_id).toBeTypeOf('string');
+  expect(clusters.items.length).toBeGreaterThan(0);
 });
 
-test('listClusters', async () => {
-  nock('https://api.civo.com/v2/')
-    .get('/kubernetes/clusters')
-    .reply(200, { items: [] });
+test('get all clusters', async () => {
+  const clusters = await client.kubernetes.listClusters();
 
-  const clusters = await api.listClusters();
-  expect(clusters.items).toEqual([]);
+  expect(clusters).toBeTruthy();
 });

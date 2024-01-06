@@ -8,12 +8,12 @@ export default defineConfig({
     copyPublicDir: false,
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: 'civots',
+      name: 'civojs',
       formats: ['es'],
     },
     rollupOptions: {
       external: ['zod', 'tiny-invariant'],
     },
   },
-  plugins: [dts({ exclude: ['src/mocks', 'src/tests'] })],
+  plugins: [dts({ exclude: ['mocks', 'tests'] })],
 });
