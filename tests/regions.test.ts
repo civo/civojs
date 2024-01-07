@@ -1,14 +1,19 @@
-import { expect, test } from 'vitest';
+import { afterAll, afterEach, beforeAll, expect, test } from 'vitest';
+import { server } from '../mocks/server';
+import { RegionsApi } from '../src/resources';
 
-import { Civo } from '../src';
+const config = {
+  apiKey: 'akjsdhjksadka',
+  regionCode: 'LON1',
+};
 
-const client = new Civo({
-	apiKey: import.meta.env.API_KEY,
-	regionCode: 'LON1',
-});
+beforeAll(() => server.listen());
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
 
 test('get all regions', async () => {
-	const regions = await client.regions.list();
+  const api = new RegionsApi(config);
+  const regions = await api.list();
 
-	expect(regions.length).toBeGreaterThan(0);
+  expect(regions.length).toBeGreaterThan(0);
 });

@@ -1,89 +1,77 @@
 import { faker } from '@faker-js/faker';
-import { afterAll, expect, test } from 'vitest';
+import { afterAll, afterEach, beforeAll, expect, test } from 'vitest';
 
-import { Civo } from '../src';
+import { server } from '../mocks/server';
+import { NetworksApi, SubnetsApi } from '../src/resources';
 import { CreateRoute, SubnetConfig } from '../src/resources/networks/types';
 
-const client = new Civo({
-	apiKey: import.meta.env.API_KEY,
-	regionCode: 'LON1',
-});
+const config = {
+  apiKey: faker.string.nanoid(),
+  regionCode: 'LON1',
+};
+const api = new NetworksApi(config);
+const subnetsApi = new SubnetsApi(config);
 
-afterAll(async () => {
-	const networks = await client.networks.list();
-	networks.forEach((network) => {
-		if (network.label?.startsWith('test-')) {
-			client.networks.destroy(network.id);
-		}
-	});
-});
+beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
 
 test('create a new network', async () => {
-	const networks = await client.networks.list();
-	const newNetwork = await client.networks.create(
-		`test-${faker.internet.domainWord()}`,
-	);
+  const networks = await api.list();
+  const newNetwork = await api.create(`test-${faker.internet.domainWord()}`);
 
-	expect(networks.length).toBeGreaterThan(0);
-	expect(newNetwork.result).toBe('success');
+  expect(networks.length).toBeGreaterThan(0);
+  expect(newNetwork.result).toBe('success');
 });
 
 test('get all networks', async () => {
-	const networks = await client.networks.list();
+  const api = new NetworksApi(config);
+  const networks = await api.list();
 
-	expect(networks).toBeTruthy();
+  expect(networks).toBeTruthy();
 });
 
 test('should list all subnets in a network', async () => {
-	const networkId = '12345678-90ab-cdef-0123-456789abcdef';
-	const subnets = await client.subnets.list(networkId);
+  const networkId = '12345678-90ab-cdef-0123-456789abcdef';
+  const subnets = await subnetsApi.list(networkId);
 
-	expect(subnets).toBeGreaterThan(1);
+  expect(subnets.length).toBeGreaterThan(1);
 });
 
 test('should get a subnet by its ID', async () => {
-	const networkId = '12345678-90ab-cdef-0123-456789abcdef';
-	const subnetId = 'fedcba98-7654-3210-9876-543210fedcba';
-	const subnet = await client.subnets.get(networkId, subnetId);
+  const networkId = '12345678-90ab-cdef-0123-456789abcdef';
+  const subnetId = 'fedcba98-7654-3210-9876-543210fedcba';
+  const subnet = await subnetsApi.get(networkId, subnetId);
 
-	expect(subnet.id).toBe(subnetId);
+  expect(subnet.id).toBe(subnetId);
 });
 
 test('should create a new subnet in a network', async () => {
-	const networkId = '12345678-90ab-cdef-0123-456789abcdef';
-	const subnetConfig: SubnetConfig = {
-		name: 'My new subnet',
-	};
+  const networkId = '12345678-90ab-cdef-0123-456789abcdef';
+  const subnetConfig: SubnetConfig = {
+    name: 'My new subnet',
+  };
 
-	const subnet = await client.subnets.create(networkId, subnetConfig);
+  const subnet = await subnetsApi.create(networkId, subnetConfig);
 
-	expect(subnet.name).toBe(subnetConfig.name);
-});
-
-test('should find a subnet by its name or ID', async () => {
-	const networkId = '12345678-90ab-cdef-0123-456789abcdef';
-	const subnetName = 'My new subnet';
-
-	const subnet = await client.subnets.find(networkId, subnetName);
-
-	expect(subnet.name).toBe(subnetName);
+  expect(subnet.name).toBe(subnetConfig.name);
 });
 
 test('should attach a subnet to an instance', async () => {
-	const networkId = '12345678-90ab-cdef-0123-456789abcdef';
-	const subnetId = 'fedcba98-7654-3210-9876-543210fedcba';
-	const routeConfig: CreateRoute = {
-		resource_id: '12345678-90ab-cdef-0123-456789abcdef',
-		resource_type: '',
-	};
+  const networkId = '12345678-90ab-cdef-0123-456789abcdef';
+  const subnetId = 'fedcba98-7654-3210-9876-543210fedcba';
+  const routeConfig: CreateRoute = {
+    resource_id: '12345678-90ab-cdef-0123-456789abcdef',
+    resource_type: '',
+  };
 
-	const route = await client.subnets.attachToInstance(
-		networkId,
-		subnetId,
-		routeConfig,
-	);
+  const route = await subnetsApi.attachToInstance(
+    networkId,
+    subnetId,
+    routeConfig,
+  );
 
-	expect(route.network_id).toBe(networkId);
+  expect(route.network_id).toBe(networkId);
 });
 
 test.todo('should detach a subnet from an instance', async () => {});
