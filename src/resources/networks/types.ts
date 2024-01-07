@@ -10,72 +10,72 @@ export type NetworkResult = z.infer<typeof NetworkResultSchema>;
 
 // Network represents a private network for instances to connect to
 export const NetworkSchema = z.object({
-  id: z.string(),
-  name: z.string().optional(),
-  default: z.boolean(),
-  cidr: z.string().optional(),
-  cidr_v6: z.string().optional(),
-  label: z.string().optional(),
-  status: z.string().optional(),
-  ipv4_enabled: z.boolean().optional(),
-  ipv6_enabled: z.boolean().optional(),
-  nameservers_v4: z.array(z.string()).optional(),
-  nameservers_v6: z.array(z.string()).optional(),
+	id: z.string(),
+	name: z.string().optional(),
+	default: z.boolean(),
+	cidr: z.string().optional(),
+	cidr_v6: z.string().optional(),
+	label: z.string().optional(),
+	status: z.string().optional(),
+	ipv4_enabled: z.boolean().optional(),
+	ipv6_enabled: z.boolean().optional(),
+	nameservers_v4: z.array(z.string()).optional(),
+	nameservers_v6: z.array(z.string()).optional(),
 });
 
 // Subnet represents a subnet within a private network
 export const SubnetSchema = z.object({
-  id: z.string(),
-  name: z.string().optional(),
-  network_id: z.string(),
-  subnet_size: z.string().optional(),
-  status: z.string().optional(),
+	id: z.string(),
+	name: z.string().optional(),
+	network_id: z.string(),
+	subnet_size: z.string().optional(),
+	status: z.string().optional(),
 });
 
 // SubnetConfig contains incoming request parameters for the subnet object
 export const SubnetConfigSchema = z.object({
-  name: z.string(),
+	name: z.string(),
 });
 export function isSubnetConfig(data: unknown): data is SubnetConfig {
-  return SubnetConfigSchema.safeParse(data).success;
+	return SubnetConfigSchema.safeParse(data).success;
 }
 
 // Route represents a route within a subnet
 export const RouteSchema = z.object({
-  id: z.string(),
-  subnet_id: z.string(),
-  network_id: z.string(),
-  resource_id: z.string(),
-  resource_type: z.string(),
+	id: z.string(),
+	subnet_id: z.string(),
+	network_id: z.string(),
+	resource_id: z.string(),
+	resource_type: z.string(),
 });
 
 // CreateRoute contains incoming request parameters for creating a route object
 export const CreateRouteSchema = z.object({
-  resource_id: z.string(),
-  resource_type: z.string(),
+	resource_id: z.string(),
+	resource_type: z.string(),
 });
 export function isCreateRoute(data: unknown): data is CreateRoute {
-  return CreateRouteSchema.safeParse(data).success;
+	return CreateRouteSchema.safeParse(data).success;
 }
 
 // NetworkConfig contains incoming request parameters for the network object
 export const NetworkConfigSchema = z.object({
-  label: z.string(),
-  default: z.string().optional(),
-  ipv4_enabled: z.boolean().optional(),
-  nameservers_v4: z.array(z.string()).optional(),
-  cidr_v4: z.string().optional(),
-  ipv6_enabled: z.boolean().optional(),
-  nameservers_v6: z.array(z.string()).optional(),
-  region: z.string(),
+	label: z.string(),
+	default: z.string().optional(),
+	ipv4_enabled: z.boolean().optional(),
+	nameservers_v4: z.array(z.string()).optional(),
+	cidr_v4: z.string().optional(),
+	ipv6_enabled: z.boolean().optional(),
+	nameservers_v6: z.array(z.string()).optional(),
+	region: z.string(),
 });
 export function isNetworkConfig(data: unknown): data is NetworkConfig {
-  return NetworkConfigSchema.safeParse(data).success;
+	return NetworkConfigSchema.safeParse(data).success;
 }
 
 // NetworkResult represents the result from a network create/update call
 export const NetworkResultSchema = z.object({
-  id: z.string(),
-  label: z.string(),
-  result: z.string(),
+	id: z.string(),
+	label: z.string(),
+	result: z.string(),
 });

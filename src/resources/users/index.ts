@@ -1,12 +1,12 @@
 import invariant from 'tiny-invariant';
 
-import { Base } from '../base';;
+import { Base } from '../base';
 import { UserEverythingSchema } from './types';
 
 export class UserApi extends Base {
-  list(user_id: string) {
-    invariant(user_id, 'User id is required');
+	list(user_id: string) {
+		invariant(user_id, 'User id is required');
 
-    return this.request(UserEverythingSchema, `/users/${user_id}/everything`);
-  }
+		return this.request(UserEverythingSchema, `/users/${user_id}/everything`);
+	}
 }

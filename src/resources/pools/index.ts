@@ -1,17 +1,17 @@
-import { Base } from '../base';;
+import { Base } from '../base';
 
 export class PoolApi extends Base {
-  list() {}
+	list() {}
 
-  create() {}
+	create() {}
 
-  get() {}
+	get() {}
 
-  find() {}
+	find() {}
 
-  destroyInstance() {}
+	destroyInstance() {}
 
-  update() {}
+	update() {}
 
-  destroy() {}
+	destroy() {}
 }

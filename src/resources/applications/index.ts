@@ -6,97 +6,97 @@ import { randomName } from '../../utils';
 import { Base } from '../base';
 import { NetworksApi } from '../networks';
 import {
-  ApplicationConfig,
-  ApplicationSchema,
-  isApplicationConfig,
-  isUpdateApplicationRequest,
-  PaginatedApplicationsSchema,
-  UpdateApplicationRequest,
+	ApplicationConfig,
+	ApplicationSchema,
+	PaginatedApplicationsSchema,
+	UpdateApplicationRequest,
+	isApplicationConfig,
+	isUpdateApplicationRequest,
 } from './types';
 
 export class ApplicationApi extends Base {
-  list() {
-    return this.request(PaginatedApplicationsSchema, '/applications');
-  }
+	list() {
+		return this.request(PaginatedApplicationsSchema, '/applications');
+	}
 
-  get(id: string) {
-    invariant(id, 'ID is required');
+	get(id: string) {
+		invariant(id, 'ID is required');
 
-    return this.request(ApplicationSchema, `/applications/${id}`);
-  }
+		return this.request(ApplicationSchema, `/applications/${id}`);
+	}
 
-  getLogAuth(id: string) {
-    invariant(id, 'ID is required');
+	getLogAuth(id: string) {
+		invariant(id, 'ID is required');
 
-    return this.request(z.string(), `/applications/${id}/log_auth`);
-  }
+		return this.request(z.string(), `/applications/${id}/log_auth`);
+	}
 
-  async createConfig() {
-    const network = new NetworksApi({
-      apiKey: this.apiKey,
-      regionCode: this.regionCode,
-    });
-    const defaultNetwork = await network.getDefault();
+	async createConfig() {
+		const network = new NetworksApi({
+			apiKey: this.apiKey,
+			regionCode: this.regionCode,
+		});
+		const defaultNetwork = await network.getDefault();
 
-    return {
-      name: randomName(),
-      network_id: defaultNetwork.id,
-      description: '',
-      size: 'small',
-      ssh_key_ids: [],
-    } satisfies ApplicationConfig;
-  }
+		return {
+			name: randomName(),
+			network_id: defaultNetwork.id,
+			description: '',
+			size: 'small',
+			ssh_key_ids: [],
+		} satisfies ApplicationConfig;
+	}
 
-  async find(search: string) {
-    search = search.toLowerCase();
-    const { items } = await this.list();
+	async find(search: string) {
+		search = search.toLowerCase();
+		const { items } = await this.list();
 
-    const found = items.find((item) => {
-      const id = item.id.toLowerCase();
-      const name = item.name?.toLowerCase();
+		const found = items.find((item) => {
+			const id = item.id.toLowerCase();
+			const name = item.name?.toLowerCase();
 
-      if (id.search(search) || name?.search(search)) {
-        return item;
-      }
-    });
+			if (id.search(search) || name?.search(search)) {
+				return item;
+			}
+		});
 
-    if (found) {
-      return found;
-    }
+		if (found) {
+			return found;
+		}
 
-    throw new Error(`Unable to find ${search}, zero matches`);
-  }
+		throw new Error(`Unable to find ${search}, zero matches`);
+	}
 
-  create(data: ApplicationConfig) {
-    if (!isApplicationConfig(data)) {
-      throw new Error('Invalid data');
-    }
+	create(data: ApplicationConfig) {
+		if (!isApplicationConfig(data)) {
+			throw new Error('Invalid data');
+		}
 
-    const body = JSON.stringify(data);
+		const body = JSON.stringify(data);
 
-    return this.request(ApplicationSchema, '/applications', {
-      method: 'POST',
-      body,
-    });
-  }
+		return this.request(ApplicationSchema, '/applications', {
+			method: 'POST',
+			body,
+		});
+	}
 
-  update(id: string, data: UpdateApplicationRequest) {
-    invariant(id, 'ID is required');
-    if (!isUpdateApplicationRequest(data)) {
-      throw new Error('Invalid data');
-    }
+	update(id: string, data: UpdateApplicationRequest) {
+		invariant(id, 'ID is required');
+		if (!isUpdateApplicationRequest(data)) {
+			throw new Error('Invalid data');
+		}
 
-    const body = JSON.stringify(data);
+		const body = JSON.stringify(data);
 
-    return this.request(ApplicationSchema, `/applications/${id}`, {
-      method: 'PUT',
-      body,
-    });
-  }
+		return this.request(ApplicationSchema, `/applications/${id}`, {
+			method: 'PUT',
+			body,
+		});
+	}
 
-  destroy(id: string) {
-    invariant(id, 'ID is required');
+	destroy(id: string) {
+		invariant(id, 'ID is required');
 
-    return this.request(SimpleResponseSchema, `/applications/${id}`);
-  }
+		return this.request(SimpleResponseSchema, `/applications/${id}`);
+	}
 }
