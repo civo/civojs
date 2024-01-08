@@ -2,7 +2,7 @@ import invariant from 'tiny-invariant';
 import { z } from 'zod';
 
 import { SimpleResponseSchema } from '../../types';
-import { Base } from '../base';;
+import { Base } from '../base';
 import {
   FirewallConfig,
   FirewallResultSchema,
@@ -19,14 +19,14 @@ export class FirewallApi extends Base {
   }
 
   async find(search: string) {
-    search = search.toLowerCase();
+    const lowerCaseSearch = search.toLowerCase();
     const items = await this.list();
 
     const found = items.find((item) => {
       const id = item.id.toLowerCase();
       const name = item.name?.toLowerCase();
 
-      if (id.search(search) || name?.search(search)) {
+      if (id.search(lowerCaseSearch) || name?.search(lowerCaseSearch)) {
         return item;
       }
     });
@@ -98,13 +98,13 @@ export class FirewallApi extends Base {
   async findRule(firewallId: string, search: string) {
     invariant(firewallId, 'Firewall id is required');
 
-    search = search.toLowerCase();
+    const lowerCaseSearch = search.toLowerCase();
     const items = await this.listRules(firewallId);
 
     const found = items.find((item) => {
       const id = item?.id?.toLowerCase();
 
-      if (id?.search(search)) {
+      if (id?.search(lowerCaseSearch)) {
         return item;
       }
     });

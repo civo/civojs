@@ -2,8 +2,8 @@ import invariant from 'tiny-invariant';
 import { z } from 'zod';
 
 import { SimpleResponseSchema } from '../../types';
-import { Base } from '../base';;
-import { isWebhookConfig, WebhookConfig, WebhookSchema } from './types';
+import { Base } from '../base';
+import { WebhookConfig, WebhookSchema, isWebhookConfig } from './types';
 
 export class WebhookApi extends Base {
   list() {
@@ -11,14 +11,14 @@ export class WebhookApi extends Base {
   }
 
   async find(search: string) {
-    search = search.toLowerCase();
+    const lowerCaseSearch = search.toLowerCase();
     const items = await this.list();
 
     const found = items.find((item) => {
       const id = item.id.toLowerCase();
       const url = item.url?.toLowerCase();
 
-      if (id.search(search) || url?.search(search)) {
+      if (id.search(lowerCaseSearch) || url?.search(lowerCaseSearch)) {
         return item;
       }
     });

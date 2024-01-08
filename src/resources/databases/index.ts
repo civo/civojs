@@ -2,22 +2,22 @@ import invariant from 'tiny-invariant';
 import { z } from 'zod';
 
 import { SimpleResponseSchema } from '../../types';
-import { Base } from '../base';;
+import { Base } from '../base';
 import {
   CreateDatabaseRequest,
   DatabaseBackupCreateRequest,
   DatabaseBackupSchema,
   DatabaseBackupUpdateRequest,
   DatabaseSchema,
+  PaginatedDatabasesSchema,
+  RestoreDatabaseRequest,
+  SupportedSoftwareVersionSchema,
+  UpdateDatabaseRequest,
   isCreateDatabaseRequest,
   isDatabaseBackupCreateRequest,
   isDatabaseBackupUpdateRequest,
   isRestoreDatabaseRequest,
   isUpdateDatabaseRequest,
-  PaginatedDatabasesSchema,
-  RestoreDatabaseRequest,
-  SupportedSoftwareVersionSchema,
-  UpdateDatabaseRequest,
 } from './types';
 
 export class DatabaseApi extends Base {
@@ -44,12 +44,10 @@ export class DatabaseApi extends Base {
       throw new Error('Invalid data');
     }
 
-    const body = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-      body.append(key, String(value));
+    return this.request(DatabaseSchema, '/databases', {
+      method: 'POST',
+      body: JSON.stringify(data),
     });
-
-    return this.request(DatabaseSchema, '/databases', { method: 'POST', body });
   }
 
   update(id: string, data: UpdateDatabaseRequest) {
@@ -67,14 +65,14 @@ export class DatabaseApi extends Base {
   }
 
   async find(search: string) {
-    search = search.toLowerCase();
+    const lowerCaseSearch = search.toLowerCase();
     const { items } = await this.list();
 
     const found = items.find((item) => {
       const id = item.id.toLowerCase();
       const name = item.name?.toLowerCase();
 
-      if (id.search(search) || name?.search(search)) {
+      if (id.search(lowerCaseSearch) || name?.search(lowerCaseSearch)) {
         return item;
       }
     });

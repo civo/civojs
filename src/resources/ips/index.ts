@@ -1,15 +1,15 @@
 import invariant from 'tiny-invariant';
 
 import { SimpleResponseSchema } from '../../types';
-import { Base } from '../base';;
+import { Base } from '../base';
 import {
   Actions,
   CreateIPRequest,
   IPSchema,
-  isCreateIPRequest,
-  isUpdateIPRequest,
   PaginatedIPsSchema,
   UpdateIPRequest,
+  isCreateIPRequest,
+  isUpdateIPRequest,
 } from './types';
 
 export class IPApi extends Base {
@@ -24,7 +24,7 @@ export class IPApi extends Base {
   }
 
   async find(search: string) {
-    search = search.toLowerCase();
+    const lowerCaseSearch = search.toLowerCase();
     const { items } = await this.list();
 
     const found = items.find((item) => {
@@ -32,7 +32,11 @@ export class IPApi extends Base {
       const name = item.name?.toLowerCase();
       const ip = item.ip?.toLowerCase();
 
-      if (id.search(search) || name?.search(search) || ip?.search(search)) {
+      if (
+        id.search(lowerCaseSearch) ||
+        name?.search(lowerCaseSearch) ||
+        ip?.search(lowerCaseSearch)
+      ) {
         return item;
       }
     });

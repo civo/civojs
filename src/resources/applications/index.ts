@@ -3,14 +3,15 @@ import { z } from 'zod';
 
 import { SimpleResponseSchema } from '../../types';
 import { randomName } from '../../utils';
-import { Base, NetworksApi } from '..';
+import { Base } from '../base';
+import { NetworksApi } from '../networks';
 import {
   ApplicationConfig,
   ApplicationSchema,
-  isApplicationConfig,
-  isUpdateApplicationRequest,
   PaginatedApplicationsSchema,
   UpdateApplicationRequest,
+  isApplicationConfig,
+  isUpdateApplicationRequest,
 } from './types';
 
 export class ApplicationApi extends Base {
@@ -47,14 +48,14 @@ export class ApplicationApi extends Base {
   }
 
   async find(search: string) {
-    search = search.toLowerCase();
+    const lowerCaseSearch = search.toLowerCase();
     const { items } = await this.list();
 
     const found = items.find((item) => {
       const id = item.id.toLowerCase();
       const name = item.name?.toLowerCase();
 
-      if (id.search(search) || name?.search(search)) {
+      if (id.search(lowerCaseSearch) || name?.search(lowerCaseSearch)) {
         return item;
       }
     });

@@ -5,14 +5,14 @@ import { SimpleResponseSchema } from '../../types';
 import { Base } from '../base';
 import { InstanceSchema } from '../instances/types';
 import {
-  isKubernetesClusterConfig,
-  isKubernetesClusterPoolConfig,
   type KubernetesClusterConfig,
   KubernetesClusterPoolConfig,
   KubernetesClusterSchema,
   KubernetesMarketplaceApplicationSchema,
   KubernetesVersionSchema,
   PaginatedKubernetesClustersSchema,
+  isKubernetesClusterConfig,
+  isKubernetesClusterPoolConfig,
 } from './types';
 
 export class KubernetesApi extends Base {
@@ -35,14 +35,14 @@ export class KubernetesApi extends Base {
    * @returns The Kubernetes cluster, or undefined if not found.
    */
   async findKubernetesCluster(search: string) {
-    search = search.toLowerCase();
+    const lowerCaseSearch = search.toLowerCase();
     const clusters = await this.listClusters();
 
     const found = clusters.items.find((cluster) => {
       const id = cluster.id.toLowerCase();
       const name = cluster.name?.toLowerCase();
 
-      if (id.search(search) || name?.search(search)) {
+      if (id.search(lowerCaseSearch) || name?.search(lowerCaseSearch)) {
         return cluster;
       }
     });
@@ -66,9 +66,9 @@ export class KubernetesApi extends Base {
     }
 
     const body = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
+    for (const [key, value] of Object.entries(data)) {
       body.append(key, value as string);
-    });
+    }
     body.set('region', this.regionCode);
 
     return this.request(KubernetesClusterSchema, '/kubernetes/clusters', {
@@ -104,9 +104,9 @@ export class KubernetesApi extends Base {
     }
 
     const body = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
+    for (const [key, value] of Object.entries(data)) {
       body.append(key, value as string);
-    });
+    }
     body.set('region', this.regionCode);
 
     return this.request(KubernetesClusterSchema, `/kubernetes/clusters/${id}`, {
@@ -130,9 +130,9 @@ export class KubernetesApi extends Base {
     }
 
     const body = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
+    for (const [key, value] of Object.entries(data)) {
       body.append(key, value as string);
-    });
+    }
     body.set('region', this.regionCode);
 
     return this.request(
@@ -231,14 +231,14 @@ export class KubernetesApi extends Base {
   async findClusterInstance(id: string, search: string) {
     invariant(id, 'ID is required');
 
-    search = search.toLowerCase();
+    const lowerCaseSearch = search.toLowerCase();
     const instances = await this.listClusterInstances(id);
 
     const found = instances.find((instance) => {
       const id = instance.id.toLowerCase();
       const hostname = instance.hostname?.toLowerCase();
 
-      if (id.includes(search) || hostname?.includes(search)) {
+      if (id.includes(lowerCaseSearch) || hostname?.includes(lowerCaseSearch)) {
         return instance;
       }
     });

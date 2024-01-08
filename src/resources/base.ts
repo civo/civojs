@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { isErrorResponse, ResponseError } from '../errors';
+import { ResponseError, isErrorResponse } from '../errors';
 
 type RegionCode = string;
 
@@ -16,19 +16,18 @@ export abstract class Base {
   protected regionCode: RegionCode;
 
   constructor(config: Config) {
-    this.baseUrl = import.meta.env.API_URL || 'https://api.civo.com';
+    this.baseUrl = 'https://api.civo.com';
     this.apiKey = config.apiKey;
-    this.apiVersion = import.meta.env.API_VERSION || 'v2';
+    this.apiVersion = import.meta.env.VITE_API_VERSION || 'v2';
     this.regionCode = config.regionCode || 'NYC1';
   }
 
   protected async request<T>(
     responseSchema: z.ZodType<T>,
-    resource: Partial<URL | RequestInfo>,
+    resource: string,
     options?: RequestInit,
   ) {
-    // Fix this to only send the region if the request is GET
-    const url = new URL(`/${this.apiVersion}${resource}/?region=${this.regionCode}`, this.baseUrl);
+    const url = new URL(`${this.apiVersion}${resource}`, this.baseUrl);
 
     const headers = {
       'Content-Type': 'application/json',

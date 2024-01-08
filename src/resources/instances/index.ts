@@ -10,31 +10,31 @@ import {
   Instance,
   InstanceConfig,
   InstanceSchema,
-  isInstanceConfig,
   PaginatedInstanceListSchema,
+  isInstanceConfig,
 } from './types';
 
 export class InstancesApi extends Base {
-  list(page: number = 1, perPage: number = 15) {
+  list(page = 1, perPage = 15) {
     const searchParams = new URLSearchParams();
     searchParams.set('page', String(page));
     searchParams.set('per_page', String(perPage));
 
-    return this.request(PaginatedInstanceListSchema, {
-      url: '/instances',
-      searchParams,
-    });
+    return this.request(
+      PaginatedInstanceListSchema,
+      `/instances${searchParams.toString()}`,
+    );
   }
 
   async find(search: string) {
-    search = search.toLowerCase();
+    const lowerCaseSearch = search.toLowerCase();
     const instances = await this.list();
 
     const found = instances.items.find((instance) => {
       const id = instance.id.toLowerCase();
       const hostname = instance.hostname?.toLowerCase();
 
-      if (id.search(search) || hostname?.search(search)) {
+      if (id.search(lowerCaseSearch) || hostname?.search(lowerCaseSearch)) {
         return instance;
       }
     });
@@ -92,14 +92,9 @@ export class InstancesApi extends Base {
       throw new Error('Invalid data');
     }
 
-    const body = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-      body.append(key, value as string);
-    });
-
     return this.request(InstanceSchema, '/instances', {
       method: 'POST',
-      body,
+      body: JSON.stringify(data),
     });
   }
 

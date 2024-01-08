@@ -1,13 +1,13 @@
 import invariant from 'tiny-invariant';
 import { z } from 'zod';
 
-import { SimpleResponseSchema } from '../../types';
 import { Base, KubernetesApi } from '..';
+import { SimpleResponseSchema } from '../../types';
 import {
-  isVolumeConfig,
   VolumeConfig,
   VolumeResultSchema,
   VolumeSchema,
+  isVolumeConfig,
 } from './types';
 
 export class VolumeApi extends Base {
@@ -52,14 +52,14 @@ export class VolumeApi extends Base {
   }
 
   async find(search: string) {
-    search = search.toLowerCase();
+    const lowerCaseSearch = search.toLowerCase();
     const items = await this.list();
 
     const found = items.find((item) => {
       const id = item.id.toLowerCase();
       const name = item.name?.toLowerCase();
 
-      if (id.search(search) || name?.search(search)) {
+      if (id.search(lowerCaseSearch) || name?.search(lowerCaseSearch)) {
         return item;
       }
     });

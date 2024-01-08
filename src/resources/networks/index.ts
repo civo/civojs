@@ -4,15 +4,15 @@ import { SimpleResponseSchema } from '../../types';
 import { Base } from '../base';
 import {
   CreateRoute,
-  isCreateRoute,
-  isNetworkConfig,
-  isSubnetConfig,
   NetworkConfig,
   NetworkResult,
   NetworkResultSchema,
   NetworkSchema,
   SubnetConfig,
   SubnetSchema,
+  isCreateRoute,
+  isNetworkConfig,
+  isSubnetConfig,
 } from './types';
 
 export class NetworksApi extends Base {
@@ -76,19 +76,15 @@ export class NetworksApi extends Base {
       body.set('label', data);
       body.set('region', this.regionCode);
     } else if (isNetworkConfig(data)) {
-      Object.entries(data).forEach(([key, value]) => {
-        body.append(key, value as string);
-      });
+      for (const [key, value] of Object.entries(data)) {
+        body.append(key, String(value));
+      }
     }
 
-    return await this.request(
-      NetworkResultSchema,
-      { url: '/networks' },
-      {
-        method: 'POST',
-        body,
-      },
-    );
+    return await this.request(NetworkResultSchema, '/networks', {
+      method: 'POST',
+      body,
+    });
   }
 
   /**
@@ -99,7 +95,7 @@ export class NetworksApi extends Base {
    * @returns A promise that resolves to the network that matches the search term.
    */
   async find(search: string) {
-    search = search.toLowerCase();
+    const lowerCaseSearch = search.toLowerCase();
     const networks = await this.list();
 
     const found = networks.find((network) => {
@@ -108,9 +104,9 @@ export class NetworksApi extends Base {
       const label = network.label?.toLowerCase();
 
       if (
-        id.includes(search) ||
-        name?.includes(search) ||
-        label?.includes(label)
+        id.includes(lowerCaseSearch) ||
+        name?.includes(lowerCaseSearch) ||
+        label?.includes(lowerCaseSearch)
       ) {
         return network;
       }
@@ -165,10 +161,7 @@ export class NetworksApi extends Base {
     const searchParams = new URLSearchParams({ region: this.regionCode });
     await this.request(
       z.object({ result: z.literal('success') }),
-      {
-        url: `/networks/${id}`,
-        searchParams,
-      },
+      `/networks/${id}${searchParams.toString()}`,
       { method: 'DELETE' },
     );
   }
@@ -192,9 +185,9 @@ export class NetworksApi extends Base {
 
     const body = new FormData();
 
-    Object.entries(data).forEach(([key, value]) => {
-      body.append(key, value as string);
-    });
+    for (const [key, value] of Object.entries(data)) {
+      body.append(key, String(value));
+    }
 
     return this.request(NetworkResultSchema, `/networks/${id}`, {
       method: 'PUT',
@@ -255,15 +248,15 @@ export class SubnetsApi extends Base {
       throw new Error('Invalid data');
     }
 
-    const body = new FormData();
+    // const body = new FormData();
 
-    Object.entries(subnet).forEach(([key, value]) => {
-      body.append(key, value as string);
-    });
+    // for (const [key, value] of Object.entries(subnet)) {
+    // body.set(key, String(value));
+    // }
 
     return this.request(SubnetSchema, `/networks/${networkId}/subnets`, {
       method: 'POST',
-      body,
+      body: JSON.stringify(subnet),
     });
   }
 
@@ -275,14 +268,14 @@ export class SubnetsApi extends Base {
    * @returns A promise for the subnet, or `undefined` if no subnet is found.
    */
   async find(networkId: string, search: string) {
-    search = search.toLowerCase();
+    const lowerCaseSearch = search.toLowerCase();
     const subnets = await this.list(networkId);
 
     const found = subnets.find((subnet) => {
       const id = subnet.id.toLowerCase();
       const name = subnet.name?.toLowerCase();
 
-      if (id.includes(search) || name?.includes(search)) {
+      if (id.includes(lowerCaseSearch) || name?.includes(lowerCaseSearch)) {
         return subnet;
       }
     });
@@ -317,9 +310,9 @@ export class SubnetsApi extends Base {
 
     const body = new FormData();
 
-    Object.entries(route).forEach(([key, value]) => {
-      body.append(key, value as string);
-    });
+    for (const [key, value] of Object.entries(route)) {
+      body.append(key, String(value));
+    }
 
     return this.request(
       SubnetSchema,

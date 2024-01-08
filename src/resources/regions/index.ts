@@ -10,11 +10,7 @@ export class RegionsApi extends Base {
    * @returns A list of regions.
    */
   list() {
-    const searchParams = new URLSearchParams({ region: this.regionCode });
-    return this.request(z.array(RegionSchema), {
-      url: '/regions',
-      searchParams,
-    });
+    return this.request(z.array(RegionSchema), '/regions');
   }
 
   /**
@@ -25,14 +21,14 @@ export class RegionsApi extends Base {
    * @returns The found region, or an error if no region is found.
    */
   async find(search: string) {
-    search = search.toLowerCase();
+    const lowerCaseSearch = search.toLowerCase();
     const regions = await this.list();
 
     const found = regions.find((region) => {
       const name = region.name.toLowerCase();
       const code = region.code.toLowerCase();
 
-      if (name.search(search) || code.search(search)) {
+      if (name.search(lowerCaseSearch) || code.search(lowerCaseSearch)) {
         return region;
       }
     });

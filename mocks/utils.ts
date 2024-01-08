@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 
-import { Region } from '../resources/regions/types';
+import { Network, Subnet, SubnetConfig } from '../src/resources/networks/types';
+import { Region } from '../src/resources/regions/types';
 
 export function createRandomRegion(): Region {
   const country = faker.location.countryCode();
@@ -26,4 +27,28 @@ export function createRandomRegion(): Region {
       public_ip_node_pools: faker.datatype.boolean(),
     },
   };
+}
+
+export function createNetwork() {
+  return {
+    default: faker.datatype.boolean(),
+    id: faker.string.uuid(),
+    name: faker.internet.domainWord(),
+  } satisfies Network;
+}
+
+export function createSubnet(networkId: string, data: SubnetConfig) {
+  return {
+    id: faker.string.uuid(),
+    network_id: networkId,
+    name: data.name,
+  } satisfies Subnet;
+}
+
+export function getSubnet(networkId: string, subnetId?: string) {
+  return {
+    id: subnetId ?? faker.string.uuid(),
+    network_id: networkId,
+    name: faker.internet.domainWord(),
+  } satisfies Subnet;
 }

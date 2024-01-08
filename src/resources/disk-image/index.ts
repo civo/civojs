@@ -1,7 +1,7 @@
 import invariant from 'tiny-invariant';
 import { z } from 'zod';
 
-import { Base } from '../base';;
+import { Base } from '../base';
 import { DiskImageSchema } from './types';
 
 export class DiskImagesApi extends Base {
@@ -21,14 +21,14 @@ export class DiskImagesApi extends Base {
   }
 
   async find(search: string) {
-    search = search.toLowerCase();
+    const lowerCaseSearch = search.toLowerCase();
     const diskImages = await this.list();
 
     const found = diskImages.find((diskImage) => {
       const id = diskImage.id.toLowerCase();
       const name = diskImage.name?.toLowerCase();
 
-      if (id.search(search) || name?.search(search)) {
+      if (id.search(lowerCaseSearch) || name?.search(lowerCaseSearch)) {
         return diskImage;
       }
     });

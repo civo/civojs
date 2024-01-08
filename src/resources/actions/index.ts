@@ -1,8 +1,8 @@
-import { Base } from '../base';;
+import { Base } from '../base';
 import {
   type ActionListRequest,
-  isActionListRequest,
   PaginateActionListSchema,
+  isActionListRequest,
 } from './types';
 
 export class ActionApi extends Base {

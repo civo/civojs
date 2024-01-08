@@ -1,14 +1,14 @@
 import invariant from 'tiny-invariant';
 
 import { SimpleResponseSchema } from '../../types';
-import { Base } from '../base';;
+import { Base } from '../base';
 import {
   CreateObjectStoreCredentialRequest,
-  isCreateObjectStoreCredentialRequest,
-  isUpdateObjectStoreCredentialRequest,
   ObjectStoreCredentialSchema,
   PaginatedObjectStoreCredentialsSchema,
   UpdateObjectStoreCredentialRequest,
+  isCreateObjectStoreCredentialRequest,
+  isUpdateObjectStoreCredentialRequest,
 } from './types';
 
 export class ObjectStoreCredentials extends Base {
@@ -29,7 +29,7 @@ export class ObjectStoreCredentials extends Base {
   }
 
   async find(search: string) {
-    search = search.toLowerCase();
+    const lowerCaseSearch = search.toLowerCase();
     const { items } = await this.list();
 
     const found = items.find((item) => {
@@ -38,9 +38,9 @@ export class ObjectStoreCredentials extends Base {
       const accessKeyId = item.access_key_id?.toLowerCase();
 
       if (
-        id.search(search) ||
-        name?.search(search) ||
-        accessKeyId.search(search)
+        id.search(lowerCaseSearch) ||
+        name?.search(lowerCaseSearch) ||
+        accessKeyId.search(lowerCaseSearch)
       ) {
         return item;
       }
