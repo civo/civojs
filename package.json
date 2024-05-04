@@ -3,11 +3,15 @@
   "description": "Civots is a client library for accessing the Civo cloud API.",
   "version": "0.0.1",
   "type": "module",
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "main": "./dist/civots.js",
   "types": "./dist/civots.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/civots.js",
+      "types": "./dist/civots.d.ts"
+    }
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -24,14 +28,18 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.4.1",
-    "@faker-js/faker": "^8.3.1",
-    "msw": "^2.0.12",
-    "tiny-invariant": "^1.3.1",
-    "typescript": "^5.3.3",
-    "vite": "^5.0.11",
-    "vite-plugin-dts": "^3.7.0",
-    "vitest": "^1.1.3",
-    "zod": "^3.22.4"
+    "@biomejs/biome": "1.7.2",
+    "@faker-js/faker": "^8.4.1",
+    "msw": "^2.2.14",
+    "tiny-invariant": "^1.3.3",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.11",
+    "vite-plugin-dts": "^3.9.0",
+    "vitest": "^1.6.0",
+    "zod": "^3.23.6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/civo/civojs"
   }
 }
