@@ -1,39 +1,55 @@
+import { afterAll, afterEach, beforeAll, expect, test } from 'bun:test';
 import { faker } from '@faker-js/faker';
-import { afterAll, afterEach, beforeAll, expect, test } from 'vitest';
-
-import { server } from '../mocks/server';
-import { NetworksApi, SubnetsApi } from '../src/resources';
-import { CreateRoute, SubnetConfig } from '../src/resources/networks/types';
+import { http, HttpResponse } from 'msw';
+import { setupServer } from 'msw/node';
+import { Civo, type CreateRoute, type SubnetConfig } from '../src';
 
 const config = {
   apiKey: faker.string.nanoid(),
   regionCode: 'LON1',
 };
-const api = new NetworksApi(config);
-const subnetsApi = new SubnetsApi(config);
+
+const handlers = [
+  http.get('https://api.civo.com/v2/networks', () => {
+    return HttpResponse.json({});
+  }),
+  http.get('https://api.civo.com/v2/networks/**/subnets', () => {
+    return HttpResponse.json({});
+  }),
+  http.get('https://api.civo.com/v2/networks/**/subnets/**', () => {
+    return HttpResponse.json({});
+  }),
+  http.get('https://api.civo.com/v2/networks/**/subnets/**/routes', () => {
+    return HttpResponse.json({});
+  }),
+];
+const server = setupServer(...handlers);
+
+const civo = new Civo(config);
 
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
 test('create a new network', async () => {
-  const networks = await api.list();
-  const newNetwork = await api.create(`test-${faker.internet.domainWord()}`);
+  const networks = await civo.networks.list();
+  const newNetwork = await civo.networks.create(
+    `test-${faker.internet.domainWord()}`,
+  );
 
   expect(networks.length).toBeGreaterThan(0);
   expect(newNetwork.result).toBe('success');
 });
 
 test('get all networks', async () => {
-  const api = new NetworksApi(config);
-  const networks = await api.list();
+  const networks = await civo.networks.list();
 
   expect(networks).toBeTruthy();
 });
 
 test('should list all subnets in a network', async () => {
   const networkId = '12345678-90ab-cdef-0123-456789abcdef';
-  const subnets = await subnetsApi.list(networkId);
+  const subnets = await civo.subnets.list(networkId);
 
   expect(subnets.length).toBeGreaterThan(1);
 });
@@ -41,7 +57,7 @@ test('should list all subnets in a network', async () => {
 test('should get a subnet by its ID', async () => {
   const networkId = '12345678-90ab-cdef-0123-456789abcdef';
   const subnetId = 'fedcba98-7654-3210-9876-543210fedcba';
-  const subnet = await subnetsApi.get(networkId, subnetId);
+  const subnet = await civo.subnets.get(networkId, subnetId);
 
   expect(subnet.id).toBe(subnetId);
 });
@@ -52,7 +68,7 @@ test('should create a new subnet in a network', async () => {
     name: 'My new subnet',
   };
 
-  const subnet = await subnetsApi.create(networkId, subnetConfig);
+  const subnet = await civo.subnets.create(networkId, subnetConfig);
 
   expect(subnet.name).toBe(subnetConfig.name);
 });
@@ -65,7 +81,7 @@ test('should attach a subnet to an instance', async () => {
     resource_type: '',
   };
 
-  const route = await subnetsApi.attachToInstance(
+  const route = await civo.subnets.attachToInstance(
     networkId,
     subnetId,
     routeConfig,

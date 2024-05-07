@@ -1,23 +1,31 @@
 import { faker } from '@faker-js/faker';
+import { http, HttpResponse } from 'msw';
+import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll, expect, test } from 'vitest';
-import { server } from '../mocks/server';
-import { KubernetesApi, NetworksApi } from '../src/resources';
+import { Civo } from '../src';
 
 const config = {
   apiKey: faker.string.nanoid(),
   regionCode: 'LON1',
 };
-const napi = new NetworksApi(config);
-const kapi = new KubernetesApi(config);
+
+const handlers = [
+  http.get('https://api.civo.com/v2/kubernetes/clusters', () => {
+    return HttpResponse.json([{}], { status: 200 });
+  }),
+];
+const server = setupServer(...handlers);
+
+const civo = new Civo(config);
 
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
 test('create a new cluster', async () => {
-  const clusters = await kapi.listClusters();
+  const clusters = await civo.kubernetes.listClusters();
   if (clusters.items.length === 0) {
-    const cluster = await kapi.createCluster({
+    const cluster = await civo.kubernetes.createCluster({
       name: 'mycluster',
       network_id: faker.string.uuid(),
     });
@@ -29,7 +37,7 @@ test('create a new cluster', async () => {
 });
 
 test('get all clusters', async () => {
-  const clusters = await kapi.listClusters();
+  const clusters = await civo.kubernetes.listClusters();
 
   expect(clusters).toBeTruthy();
 });
